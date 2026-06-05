@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏟 모스피배 대회규정 퀴즈</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1D9E75; --green-light: #EAF3DE; --green-dark: #0F6E56;
+    --red-light: #FCEBEB; --red-dark: #A32D2D;
+    --gray-50: #F8F8F6; --gray-100: #EDEDEA; --gray-400: #888780;
+    --gray-700: #444441; --gray-900: #1A1A18;
+    --radius: 10px; --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+  .container { width: 100%; max-width: 560px; }
+  .site-header { text-align: center; margin-bottom: 2rem; }
+  .site-header .badge { display: inline-block; background: var(--green); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 99px; margin-bottom: 10px; }
+  .site-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .site-header p { font-size: 14px; color: var(--gray-400); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .card { background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--gray-100); padding: 2rem 1.5rem; }
+  .name-screen .card { text-align: center; }
+  .name-screen .icon { font-size: 40px; margin-bottom: 1rem; }
+  .name-screen h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .name-screen p { font-size: 14px; color: var(--gray-400); margin-bottom: 1.5rem; line-height: 1.6; }
+  .name-screen input { width: 100%; padding: 12px 16px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; border: 1.5px solid var(--gray-100); border-radius: var(--radius); background: var(--gray-50); color: var(--gray-900); margin-bottom: 12px; transition: border-color 0.2s; }
+  .name-screen input:focus { outline: none; border-color: var(--green); }
+  .name-screen input::placeholder { color: var(--gray-400); }
+  .btn-primary { width: 100%; padding: 13px; font-size: 15px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; background: var(--green); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; transition: background 0.2s; }
+  .btn-primary:hover { background: var(--green-dark); }
+  .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .q-num { font-size: 13px; color: var(--gray-400); font-weight: 500; }
+  .name-tag { font-size: 12px; color: var(--green-dark); background: var(--green-light); padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+  .prog-bg { height: 5px; background: var(--gray-100); border-radius: 99px; margin-bottom: 1.5rem; overflow: hidden; }
+  .prog-fill { height: 5px; background: var(--green); border-radius: 99px; transition: width 0.5s ease; }
+  .q-text { font-size: 16px; font-weight: 700; line-height: 1.65; margin-bottom: 1.25rem; }
+  .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt-btn { background: #fff; border: 1.5px solid var(--gray-100); border-radius: var(--radius); padding: 11px 14px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; color: var(--gray-700); cursor: pointer; text-align: left; line-height: 1.5; transition: border-color 0.15s, background 0.15s; display: flex; align-items: flex-start; gap: 10px; }
+  .opt-btn:hover:not(:disabled) { border-color: var(--green); background: var(--green-light); }
+  .opt-btn .opt-label { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; border-radius: 50%; background: var(--gray-100); font-size: 12px; font-weight: 700; color: var(--gray-400); flex-shrink: 0; margin-top: 1px; }
+  .opt-btn.correct { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+  .opt-btn.correct .opt-label { background: var(--green); color: #fff; }
+  .opt-btn.wrong { border-color: var(--red-dark); background: var(--red-light); color: var(--red-dark); }
+  .opt-btn.wrong .opt-label { background: var(--red-dark); color: #fff; }
+  .opt-btn.reveal-correct { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+  .opt-btn.reveal-correct .opt-label { background: var(--green); color: #fff; }
+  .opt-btn:disabled { cursor: default; }
+  .feedback { font-size: 13px; color: var(--gray-700); background: var(--gray-50); border-left: 3px solid var(--green); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; line-height: 1.7; margin-bottom: 1rem; display: none; }
+  .feedback.show { display: block; }
+  .next-btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; background: var(--gray-900); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; display: none; transition: opacity 0.2s; }
+  .next-btn.show { display: block; }
+  .next-btn:hover { opacity: 0.85; }
+  .result-screen .score-section { text-align: center; padding: 1.5rem 0; border-bottom: 1px solid var(--gray-100); margin-bottom: 1.5rem; }
+  .grade-emoji { font-size: 48px; margin-bottom: 8px; }
+  .grade-text { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .score-name { font-size: 14px; color: var(--gray-400); margin-bottom: 16px; }
+  .score-nums { display: flex; justify-content: center; gap: 2rem; }
+  .score-stat { text-align: center; }
+  .score-stat .num { font-size: 32px; font-weight: 700; }
+  .score-stat .num.green { color: var(--green); }
+  .score-stat .lbl { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  .bd-title { font-size: 13px; font-weight: 700; color: var(--gray-400); margin-bottom: 10px; }
+  .breakdown { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; max-height: 300px; overflow-y: auto; }
+  .bd-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: var(--radius); background: var(--gray-50); font-size: 13px; }
+  .bd-q { color: var(--gray-700); flex: 1; margin-right: 8px; }
+  .bd-tag { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; flex-shrink: 0; }
+  .tag-o { background: var(--green-light); color: var(--green-dark); }
+  .tag-x { background: var(--red-light); color: var(--red-dark); }
+  .btn-restart { width: 100%; padding: 12px; font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; background: #fff; color: var(--gray-700); border: 1.5px solid var(--gray-100); border-radius: var(--radius); cursor: pointer; transition: background 0.15s; }
+  .btn-restart:hover { background: var(--gray-50); }
+  .lb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+  .lb-header h2 { font-size: 16px; font-weight: 700; }
+  .lb-header button { font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: var(--gray-400); background: none; border: 1px solid var(--gray-100); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; }
+  .lb-row { display: flex; align-items: center; padding: 10px 14px; border-radius: var(--radius); background: var(--gray-50); margin-bottom: 6px; gap: 12px; }
+  .lb-rank { font-size: 13px; font-weight: 700; color: var(--gray-400); min-width: 24px; }
+  .lb-rank.gold { color: #BA7517; } .lb-rank.silver { color: #888780; } .lb-rank.bronze { color: #854F0B; }
+  .lb-name { font-size: 14px; font-weight: 500; flex: 1; }
+  .lb-score { font-size: 14px; font-weight: 700; color: var(--green); }
+  .lb-pct { font-size: 12px; color: var(--gray-400); }
+  .lb-empty { text-align: center; color: var(--gray-400); font-size: 14px; padding: 2rem 0; }
+  @media (max-width: 480px) { body { padding: 1rem 0.75rem; } .card { padding: 1.5rem 1.25rem; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="site-header">
+    <div class="badge">MOSPI CUP 2026</div>
+    <h1>🏟 모스피배 대회규정 퀴즈</h1>
+    <p>경기 규칙 집중 · 총 30문항</p>
+  </div>
+
+  <div class="screen name-screen active" id="screen-name">
+    <div class="card">
+      <div class="icon">✍️</div>
+      <h2>시작하기 전에</h2>
+      <p>이름을 입력하면 퀴즈가 시작돼요.<br>결과는 팀 리더보드에 기록됩니다.</p>
+      <input type="text" id="name-input" placeholder="이름을 입력하세요" maxlength="20" />
+      <button class="btn-primary" onclick="startQuiz()">퀴즈 시작하기 →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-quiz">
+    <div class="card">
+      <div class="quiz-meta">
+        <span class="q-num" id="q-num">1 / 30</span>
+        <span class="name-tag" id="name-tag"></span>
+      </div>
+      <div class="prog-bg"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">다음 문제 →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-result">
+    <div class="card result-screen">
+      <div class="score-section">
+        <div class="grade-emoji" id="grade-emoji"></div>
+        <div class="grade-text" id="grade-text"></div>
+        <div class="score-name" id="score-name"></div>
+        <div class="score-nums">
+          <div class="score-stat"><div class="num green" id="s-correct"></div><div class="lbl">정답</div></div>
+          <div class="score-stat"><div class="num" id="s-wrong"></div><div class="lbl">오답</div></div>
+          <div class="score-stat"><div class="num green" id="s-pct"></div><div class="lbl">정답률</div></div>
+        </div>
+      </div>
+      <div class="bd-title">문항별 결과</div>
+      <div class="breakdown" id="breakdown"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-restart" onclick="showLeaderboard()" style="flex:1">🏆 리더보드 보기</button>
+        <button class="btn-restart" onclick="restartQuiz()" style="flex:1">↩ 다시 풀기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-lb">
+    <div class="card">
+      <div class="lb-header">
+        <h2>🏆 팀 리더보드</h2>
+        <button onclick="goHome()">← 홈으로</button>
+      </div>
+      <div id="lb-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  // 경기 시간 & 진행
+  { q:"경기 시간은 얼마인가요?", opts:["10분 단판","15분 단판","20분 전후반","25분 단판"], ans:1, exp:"제4조: 예선·본선 모두 15분 단판입니다." },
+  { q:"경기 시작 몇 분 후에 입장하면 결과와 상관없이 3:0 패배 처리되나요?", opts:["1분","2분","3분","5분"], ans:2, exp:"제4조: 경기 시작 3분 후 입장 팀은 경기 결과와 무관하게 3:0 패배 처리됩니다." },
+  { q:"다음 경기에 출전하는 팀은 경기 시작 몇 분 전까지 구장 입구에 도착해야 하나요?", opts:["5분 전","10분 전","15분 전","20분 전"], ans:1, exp:"제4조: 다음 경기에 참여하는 팀은 경기 시작 10분 전까지 구장 입구에 도착해야 합니다." },
+  { q:"모든 경기는 언제까지 진행되나요?", opts:["전광판 시간 종료 시","대회본부 신호 시","심판 휘슬이 울릴 때까지","선수 합의 시"], ans:2, exp:"제7조: 모든 경기는 심판의 휘슬이 울릴 시까지 진행합니다." },
+  { q:"대회 심판은 몇 심제로 진행되나요?", opts:["1심제","2심제","3심제","VAR 포함 4심제"], ans:1, exp:"제7조: 대회 심판은 예선리그전부터 결승전까지 전부 2심제로 진행합니다." },
+
+  // 득점 & 파울
+  { q:"누적 파울 몇 회부터 세컨드 패널티킥이 적용되나요?", opts:["2회","3회","4회","5회"], ans:2, exp:"제7조: 한 경기 누적 파울 3회까지 일반 파울, 4회부터 세컨드 패널티킥 룰이 적용됩니다." },
+  { q:"코너킥 직접 슈팅 골은 득점으로 인정되나요?", opts:["아니오, 터치 필요","예, 직접 득점 인정","심판 판단","상황에 따라 다름"], ans:1, exp:"제7조: 코너킥 직접 슈팅 골은 터치 없이 득점으로 인정합니다." },
+  { q:"킥오프로 직접 골을 넣으면?", opts:["득점 인정","득점 불인정, 단 한 명이라도 터치 시 인정","상대 골킥으로 재개","심판 재량"], ans:1, exp:"제7조: 킥오프·킥인·클리어런스는 직접 득점 불가. 한 명이라도 터치 시 득점 인정입니다." },
+  { q:"킥인으로 직접 득점이 가능한가요?", opts:["가능","불가, 한 명이라도 터치 시 인정","항상 불가","상대팀이 동의하면 가능"], ans:1, exp:"제7조: 킥인은 직접 득점 불가. 단 한 명이라도 터치 시 득점 인정입니다." },
+  { q:"클리어런스로 직접 득점이 가능한가요?", opts:["가능","불가, 한 명이라도 터치 시 인정","항상 불가","골키퍼만 가능"], ans:1, exp:"제7조: 클리어런스는 직접 득점 불가. 단 한 명이라도 터치 시 득점 인정입니다." },
+
+  // 골레이로(골키퍼) 규정
+  { q:"골레이로 클리어런스는 어떻게 재개해야 하나요?", opts:["발로만","반드시 손으로","손·발 모두 자유","드리블 후 패스"], ans:1, exp:"제7조: 골레이로 클리어런스는 반드시 손으로 재개해야 합니다. 인플레이 중 잡은 볼은 발로 찰 수 있습니다." },
+  { q:"인플레이 중 골레이로가 잡은 볼은?", opts:["반드시 손으로만 방출","발로 찰 수 있다","그 자리에서 드롭볼","심판 재량"], ans:1, exp:"제7조: 인플레이 중 잡은 볼은 발로 찰 수 있습니다. 클리어런스만 손으로 재개 필수입니다." },
+  { q:"골레이로가 공을 잡은 후 방출 제한 시간은?", opts:["2초","3초","4초","5초"], ans:2, exp:"제7조: 골레이로는 공을 잡은 후 4초 내에 방출해야 합니다. 4초 초과 시 공격권이 상대팀으로 넘어갑니다." },
+  { q:"백패스를 골레이로가 손으로 잡으면?", opts:["허용","간접 프리킥 파울","직접 프리킥","옐로카드"], ans:1, exp:"제7조: 백패스는 모두 허용하지만 손으로 잡을 시 파울로 간접 프리킥이 부여됩니다." },
+  { q:"필드 선수가 골레이로에게 하는 백패스는?", opts:["모두 금지","모두 허용(단 손으로 잡으면 파울)","발로만 허용","헤딩만 허용"], ans:1, exp:"제7조: 백패스 제한 룰 없이 모든 패스를 허용합니다. 단 손으로 잡을 시 간접 프리킥 파울입니다." },
+  { q:"골레이로를 교체할 때는?", opts:["수시로 자유롭게","심판에게 중단 요청 후 교체","하프타임에만","팀장 허가 후"], ans:1, exp:"제7조: 골레이로 교체 시에는 심판에게 중단 요청 후 교체해야 합니다." },
+
+  // 킥인 & 아웃오브플레이
+  { q:"공이 사이드라인 밖으로 나가면?", opts:["스로인","코너킥","사이드킥인","드롭볼"], ans:2, exp:"제7조: 사이드 아웃된 공은 사이드킥인으로 진행합니다." },
+  { q:"공이 천장 그물망에 닿으면?", opts:["코너킥","골킥","사이드킥인","드롭볼"], ans:2, exp:"제7조: 풋살장 천장 그물망에 터치된 공은 사이드킥인으로 진행합니다." },
+  { q:"공이 골라인 밖으로 나가면?", opts:["코너킥","클리어런스(골키퍼가 손으로 재개)","사이드킥인","드롭볼"], ans:1, exp:"제7조: 골라인 아웃은 클리어런스로 진행합니다. 골레이로가 손으로 재개합니다." },
+  { q:"킥인 시 공을 라인 위에 정확히 놓지 않으면?", opts:["재킥인 기회 부여","킥인파울로 공격권 상대팀으로","경고 부여","심판 재량"], ans:1, exp:"제7조: 굴러가는 공이나 라인 위에 놓지 않은 공으로 킥인 진행 시 킥인파울로 공격권이 상대팀으로 넘어갑니다." },
+  { q:"킥인 시 상대 선수는 몇 m 이상 떨어져야 하나요?", opts:["3m","5m","7m","10m"], ans:1, exp:"제7조: 킥인 시 5m룰을 지켜야 합니다. 심판 중재는 킥인 공을 잡은 당사자의 요청 하에만 진행됩니다." },
+  { q:"킥인 4초룰 위반 시?", opts:["경고","공격권이 상대팀으로 넘어감","간접 프리킥","재킥인"], ans:1, exp:"제7조: 킥인·클리어런스·백패스 4초룰 적용. 4초 이상 지연 시 공격권이 상대팀으로 넘어갑니다." },
+
+  // 선수 교체 & 장비
+  { q:"선수 교체는 언제 가능한가요?", opts:["인플레이 때만","데드볼 때만","인·아웃 오브 플레이 상관없이 수시로","전·후반 사이만"], ans:2, exp:"제7조: 선수 교체는 교체 지역에서 인·아웃 오브 플레이 관계없이 수시로 가능합니다." },
+  { q:"참가 선수가 반드시 착용해야 하는 것이 아닌 것은?", opts:["풋살화(인조잔디용)","정강이보호대","축구스타킹","장갑"], ans:3, exp:"제5조: 풋살화·정강이보호대·축구스타킹은 필수 착용. 장갑은 의무 착용 규정이 없습니다." },
+  { q:"참가 선수가 착용할 수 없는 것은?", opts:["고무 부착 고글","정강이보호대","일반 안경","풋살화"], ans:2, exp:"제5조: 경기 출전 시 일반 안경은 착용 불가. 고무·스폰지 부착 고글은 착용 가능합니다." },
+  { q:"착용 불가한 악세사리가 아닌 것은?", opts:["반지","시계","귀걸이","테이프로 가린 피어싱"], ans:3, exp:"제5조: 시계·반지·귀걸이 등 일체의 악세사리 착용 불가. 뺄 수 없는 피어싱은 테이프로 가리면 됩니다." },
+
+  // 카드 & 징계
+  { q:"한 경기에서 옐로카드 2장을 받으면?", opts:["경고 누적만","즉시 퇴장·다음 1경기 출전 불가","즉시 퇴장·대회 전체 출전 불가","벌금"], ans:1, exp:"제6조: 한 경기 옐로카드 2장 시 즉시 퇴장, 다음 1경기 출전 불가입니다." },
+  { q:"예선리그 경고(옐로카드)는 본선리그에서 리셋되나요?", opts:["예, 리셋됨","아니오, 누적 적용됨","팀 선택 가능","심판 판단"], ans:1, exp:"제6조: 예선리그의 경고는 본선리그까지 누적 적용됩니다. 경고 리셋 없음." },
+  { q:"퇴장 선수 발생 시 해당 팀은 몇 분간 수적 열세로 경기하나요?", opts:["1분","2분","3분","5분"], ans:1, exp:"제6조: 퇴장 선수 발생 시 해당 팀은 4대5로 2분간 경기를 진행합니다." },
+  { q:"경기 중 심판 판정에 불응하여 2분 안에 경기에 임하지 않으면?", opts:["경고 처리","잔여경기 포기로 간주","퇴장 처리","몰수패"], ans:1, exp:"제6조: 심판 판정 시비 등으로 2분 안에 경기에 임하지 않으면 잔여경기를 포기한 것으로 간주합니다." },
+
+  // 순위 & 승부차기
+  { q:"리그 종료 후 승점이 같을 때 1차 순위 결정 기준은?", opts:["골 득점 수","골득실(득점-실점)","승자승","추첨"], ans:1, exp:"제4조: 승점 동일 시 골득실(득점-실점)로 결정합니다." },
+  { q:"2팀 간 승점·골득실까지 동일하면?", opts:["추첨","승자승","승부차기(3인)","최다득점"], ans:2, exp:"제4조: 2팀 간 승점·골득실 동일 시 승부차기(3인)로 결정합니다." }
+];
+
+let userName = '', current = 0, score = 0, results = [], answered = false;
+const STORAGE_KEY = 'mospi_lb_2026';
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+function startQuiz() {
+  const n = document.getElementById('name-input').value.trim();
+  if (!n) { document.getElementById('name-input').focus(); return; }
+  userName = n; current = 0; score = 0; results = [];
+  show('quiz'); render();
+}
+function render() {
+  const q = questions[current];
+  document.getElementById('q-num').textContent = `${current + 1} / ${questions.length}`;
+  document.getElementById('name-tag').textContent = userName;
+  document.getElementById('prog').style.width = `${(current / questions.length) * 100}%`;
+  document.getElementById('q-text').textContent = q.q;
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  ['A','B','C','D'].forEach((lbl, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-label">${lbl}</span><span>${q.opts[i]}</span>`;
+    btn.onclick = () => select(i);
+    opts.appendChild(btn);
+  });
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('next-btn').className = 'next-btn';
+  answered = false;
+}
+function select(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach((b, i) => { b.disabled = true; if (i === q.ans) b.classList.add('reveal-correct'); });
+  const ok = idx === q.ans;
+  if (ok) { score++; btns[idx].classList.remove('reveal-correct'); btns[idx].classList.add('correct'); }
+  else { btns[idx].classList.add('wrong'); }
+  results.push({ q: q.q.length > 22 ? q.q.slice(0,22)+'…' : q.q, ok });
+  const fb = document.getElementById('feedback');
+  fb.textContent = (ok ? '✅ 정답! ' : '❌ 오답! ') + q.exp;
+  fb.className = 'feedback show';
+  const nb = document.getElementById('next-btn');
+  nb.textContent = current < questions.length - 1 ? '다음 문제 →' : '결과 보기 →';
+  nb.className = 'next-btn show';
+}
+function nextQ() {
+  current++;
+  if (current >= questions.length) showResult();
+  else render();
+}
+function showResult() {
+  const pct = Math.round((score / questions.length) * 100);
+  const grades = [
+    { min:90, e:'🏆', t:'완벽해요! 경기 규정 마스터!' },
+    { min:70, e:'👍', t:'잘 알고 있어요!' },
+    { min:50, e:'😅', t:'조금 더 확인이 필요해요' },
+    { min:0,  e:'📖', t:'규정을 다시 읽어봐요' }
+  ];
+  const g = grades.find(x => pct >= x.min);
+  document.getElementById('grade-emoji').textContent = g.e;
+  document.getElementById('grade-text').textContent = g.t;
+  document.getElementById('score-name').textContent = `${userName}님의 결과`;
+  document.getElementById('s-correct').textContent = score;
+  document.getElementById('s-wrong').textContent = questions.length - score;
+  document.getElementById('s-pct').textContent = pct + '%';
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = results.map((r,i) =>
+    `<div class="bd-row"><span class="bd-q">Q${i+1}. ${r.q}</span><span class="bd-tag ${r.ok?'tag-o':'tag-x'}">${r.ok?'정답':'오답'}</span></div>`
+  ).join('');
+  saveToLeaderboard(userName, score, pct);
+  show('result');
+}
+function saveToLeaderboard(name, sc, pct) {
+  let lb = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  lb.push({ name, score: sc, pct, total: questions.length, date: new Date().toLocaleDateString('ko-KR') });
+  lb.sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
+}
+function showLeaderboard() {
+  const lb = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const list = document.getElementById('lb-list');
+  if (lb.length === 0) {
+    list.innerHTML = '<div class="lb-empty">아직 기록이 없어요</div>';
+  } else {
+    const rankLabels = ['🥇','🥈','🥉'];
+    const rankClass = ['gold','silver','bronze'];
+    list.innerHTML = lb.map((r,i) => `
+      <div class="lb-row">
+        <span class="lb-rank ${rankClass[i]||''}">${rankLabels[i]||(i+1)}</span>
+        <span class="lb-name">${r.name}</span>
+        <span class="lb-pct">${r.date}</span>
+        <span class="lb-score">${r.score}/${r.total}</span>
+      </div>
+    `).join('');
+  }
+  show('lb');
+}
+function goHome() { show('name'); }
+function restartQuiz() { document.getElementById('name-input').value=''; show('name'); }
+document.getElementById('name-input').addEventListener('keydown', e => { if(e.key==='Enter') startQuiz(); });
+</script>
+</body>
+</html>
